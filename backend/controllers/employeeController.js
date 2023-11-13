@@ -17,6 +17,16 @@ const addEmployee = async (req, res) => {
 const completeRegistration = async (req, res) => {
     const { email, password, first_name, last_name, birth_date, employee_number, salary, role, manager_id} = req.body;
     const hashedPassword = await bcrypt.hash(password, 10); //hash password
+
+    try{
+        await db.query( //insert new employee into DB
+            'UPDATE employee SET password_hash = $1, first_name = $2, last_name = $3, birth_date = $4, employee_number = $5, salary = $6, role = $7, manager_id = $8 WHERE email = $9',
+            [hashedPassword, first_name, last_name, birth_date, employee_number, salary, role, manager_id, email]
+        );
+        res.status(201).json({ message: 'Employee registration completed successfully' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 };
 
 // Other CRUD operations for employees
