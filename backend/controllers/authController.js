@@ -7,13 +7,13 @@ const register = async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(password, 10); //hash password
         const newCompany = await db.query( //insert new company into DB
-            "INSERT INTO company (company_name, address) VALUES ($1, $2) RETURNING id",
+            "INSERT INTO company (name, address) VALUES ($1, $2) RETURNING id",
             [companyName, address]
         );
         const companyID = newCompany.rows[0].id; //get new company id
         const newUser = await db.query( //insert new employee into DB
-            "INSERT INTO employee (email, password_hash, company_id, access_role, first_name, last_name, birth_date, employee_number, salary, role, manager_id) ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id", 
-            [email, hashedPassword, companyID, 'admin', first_name, last_name, birth_date, employee_number, salary, role, manager_id]
+            "INSERT INTO employee (email, password_hash, company_id, access_role, first_name, last_name, birth_date, employee_number, salary, role, manager_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id", 
+            [email, hashedPassword, companyID, 'Admin', first_name, last_name, birth_date, employee_number, salary, role, manager_id]
         );
 
         res.status(201).json({ userId: newUser.rows[0].id, companyId: companyID });
@@ -47,4 +47,15 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = {register,login};
+const test = async (req, res) => {
+    try{
+        const result = await db.query(
+            "SELECT * FROM testtable"
+        );
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports = {register,login, test};
