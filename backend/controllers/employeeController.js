@@ -5,7 +5,7 @@ const { sendRegistrationEmail } = require('../utils/emailService');
 const addEmployee = async (req, res) => {
     const { email, companyId, access_role } = req.body;
     try{    
-        await db.query('INSERT INTO employee (email, company_id, access_role) VALUES ($1, $2, $3)', [email, companyId, access_role]); // Add employee with minimal details
+        await db.query('INSERT INTO employee (email, company_id, access_role, first_name, last_name, employee_number) VALUES ($1, $2, $3, $4, $5, $6)', [email, companyId, access_role, "", "",""]); // Add employee with minimal details
 
         const registrationLink = `https://yourapp.com/complete-registration?email=${email}`; //Create registration link
         sendRegistrationEmail(email, registrationLink); //Send email invitation
