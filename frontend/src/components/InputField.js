@@ -7,3 +7,4 @@ const InputField = ({ label, type, value, onChange }) => {
         </div>
     );
 };
+export default InputField;

@@ -1,15 +1,19 @@
 import React from 'react';
-import { Route, Switch } from  'react-router-dom';
+import { Route, Routes } from  'react-router-dom';
+import HomePage from './views/HomePage';
 import CompanyRegistration from './views/CompanyRegistration';
+import LoginPage from './views/LoginPage';
 
-function App () {
+function App() {
   return (
     <div className="App">
-      <Switch>
-        <Route exact path="/" component={CompanyRegistration} />
-      </Switch>
+      <Routes>
+      <Route path="/" element={<HomePage />} />
+        <Route path="/register-company" element={<CompanyRegistration />} />
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
     </div>
-  )
+  );
 }
 
 export default App;

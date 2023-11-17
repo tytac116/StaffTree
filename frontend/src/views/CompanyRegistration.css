@@ -1,0 +1,39 @@
+/* CompanyRegistration.css */
+.registration-container {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: white; /* Optional for better visibility */
+}
+
+.registration-title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.registration-heading {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.registration-employee {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.registration-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.registration-form > * {
+    margin-top: 10px;
+}
+
+.registration-button {
+    margin-top: 20px;
+}
