@@ -41,6 +41,7 @@ const login = async (req, res) => {
 
         //Create and assign a token
         const token = jwt.sign({ userId: user.id, email: user.email, accessRole: user.access_role, companyId: user.company_id }, process.env.ACCESS_TOKEN_SECRET);
+        console.log("Successfully logged in!");
         res.json({ token });
     } catch (err) {
         res.status(500).json({ message: err.message });

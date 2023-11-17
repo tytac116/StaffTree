@@ -31,10 +31,51 @@ const completeRegistration = async (req, res) => {
     }
 };
 
-// Other CRUD operations for employees
+// Function to get the hierarchy of employees within a company
+const getHierarchy = async (req, res) => {
+    try {
+        // Execute a SQL query to get all employees in the company along with their manager's first and last name
+        const result = await db.query(`
+            SELECT e1.*, e2.first_name AS manager_first_name, e2.last_name AS manager_last_name
+            FROM employee e1
+            LEFT JOIN employee e2 ON e1.manager_id = e2.id
+            WHERE e1.company_id = $1
+        ` , [req.user.companyId]); // $1 is replaced with the company ID from the request user
+    } catch (err) {
+        // If an error occurs, send a 500 status code and the error message
+        res.status(500).json({ message: err.message });
+    }
+};
+
+
+const buildHierarchyTree = (employees) => {// Function to build a hierarchical tree from a flat array of employees
+    // Initialize the tree and lookup structures
+    let tree = [];
+    let lookup = {};
+
+    // First loop: add each employee to the lookup object and add an empty children array to each employee
+    employees.forEach(emp => {
+        lookup[emp.id] = emp;
+        lookup[emp.id].children = [];
+    });
+
+    // Second loop: add each employee to their manager's children array or to the tree if they don't have a manager
+    employees.forEach(emp => {
+        if (emp.manager_id) {
+            lookup[emp.manager_id].children.push(lookup[emp.id]);
+        } else {
+            tree.push(lookup[emp.id]);
+        }
+    });
+
+    // Return the tree structure
+    return tree;
+};
+
 
 module.exports = {
     addEmployee,
     completeRegistration,
-    // other exported functions
+    getHierarchy,
+    buildHierarchyTree
 };
