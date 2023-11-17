@@ -1,8 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, TextField, Box } from '@mui/material';
+import {jwtDecode} from 'jwt-decode';
 
-const AddEmployeeForm = ({ isAdmin }) => {
+
+const AddEmployeeForm = () => {
+
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+        firstName: '',
+        lastName: '',
+        birthDate: '',
+        employeeNumber: '',
+        salary: '',
+        role: '',
+        managerId: ''
+    });
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+    const checkAdminRole = () => {
+        const token = localStorage.getItem('token');
+        if (!token) return false;
+
+        const decodedToken = jwtDecode(token);
+        return decodedToken.accessRole === 'Admin';
+    };
+
     const isAdmin = checkAdminRole();
+
+
     if (!isAdmin) return null;
 
     return (
