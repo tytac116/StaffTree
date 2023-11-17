@@ -31,8 +31,8 @@ const completeRegistration = async (req, res) => {
     }
 };
 
-// Function to get the hierarchy of employees within a company
-const getHierarchy = async (req, res) => {
+
+const getHierarchy = async (req, res) => {// Function to get the hierarchy of employees within a company
     try {
         // Execute a SQL query to get all employees in the company along with their manager's first and last name
         const result = await db.query(`
