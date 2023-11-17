@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
 import axios from 'axios';
 import './LoginPage.css';
+import { useNavigate } from 'react-router-dom';
+
 
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
 
   const handleChange = (e) => {
@@ -16,7 +19,7 @@ const LoginPage = () => {
     try {
       const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/login`, formData);
       console.log(response.data);  // Handle the response appropriately
-      // Redirect or show success message
+      navigate('/hierarchy');
     } catch (error) {
       console.error(error.message);  // Display error message
     }

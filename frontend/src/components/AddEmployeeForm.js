@@ -1,75 +1,12 @@
-import React, { useState } from 'react';
-import { TextField, Button, Container, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './CompanyRegistration.css';
+import React from 'react';
+import { Button, TextField, Box } from '@mui/material';
 
-
-
-const CompanyRegistration = () => {
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-        companyName: '',
-        address: '',
-        firstName: '',
-        lastName: '',
-        birthDate: '',
-        employeeNumber: '',
-        salary: '',
-        role: '',
-        managerId: ''
-    });
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try{
-            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/register`, formData);
-            console.log(response.data);
-            
-            navigate('/hierarchy'); // after successful login
-
-        } catch (err) {
-            console.log(err);
-        }
-    };
+const AddEmployeeForm = ({ isAdmin }) => {
+    const isAdmin = checkAdminRole();
+    if (!isAdmin) return null;
 
     return (
-        <Container maxWidth="sm" className="registration-container">
-            <Typography variant="h4" className="registration-title">Company Registration</Typography>
-            <br />
-            <Typography variant="h6" className="registration-heading">Enter Company Details</Typography>
-            <form onSubmit={handleSubmit} className="registration-form">
-            
-            <TextField
-                label="Company Name"
-                type="text"
-                name="companyName"
-                value={formData.companyName}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                required
-            />
-            
-            <TextField
-                label="Address"
-                type="text"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                required
-            />
-            < br />
-            <Typography variant="h6" className="registration-employee">Add Yourself As The First Employee! </Typography>
-
+        <Box>
             <TextField
                 label="Email"
                 type="email"
@@ -169,10 +106,9 @@ const CompanyRegistration = () => {
             />
 
             <br />
-                <Button type="submit" variant="contained" color="primary" className="registration-button" fullWidth>Register</Button>
-            </form>
-        </Container>
+            <Button type="submit" variant="contained" color="primary" className="registration-button" fullWidth>Register</Button>
+        </Box>
     );
 };
 
-export default CompanyRegistration;
+export default AddEmployeeForm;
