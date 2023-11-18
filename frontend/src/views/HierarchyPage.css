@@ -7,3 +7,22 @@
   justify-content: center; /* Center the tree horizontally */
   align-items: flex-start; /* Align the tree to the top */
 }
+
+.button-container {
+  margin-right: 10px;
+  width: 800px; 
+  flex-direction: row;
+  background-color: rgb(187, 255, 0);
+  justify-content: space-between;
+}
+.button-container .MuiButton-root.edit-button {
+  margin-left: 10px;
+  background-color: #3f51b5;
+  color: white;
+}
+
+.button-container .MuiButton-root.delete-button {
+  margin-left: 10px;
+  background-color: #f50057;
+  color: white;
+}

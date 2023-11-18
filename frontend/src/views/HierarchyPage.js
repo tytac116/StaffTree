@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import Tree from 'react-d3-tree';
 import axios from 'axios';
-import { Container, Typography, Box } from '@mui/material';
+import { jwtDecode } from 'jwt-decode';
+import { Container, Typography, Box, TextField } from '@mui/material';
 import AddEmployeeForm from '../components/AddEmployeeForm';
 import './HierarchyPage.css';
+import { debounce } from 'lodash';
 
 const HierarchyPage = () => {
     const [treeData, setTreeData] = useState(null);
+    const [originalTreeData, setOriginalTreeData] = useState(null);
 
+
+   
     const renderRectSvgNode = ({ nodeDatum, toggleNode }) => (
         <g>
             <circle r="10" onClick={toggleNode} />
@@ -24,39 +29,46 @@ const HierarchyPage = () => {
                     Employee Number: {nodeDatum.employee_number}
                 </text>
             )}
+
+            
         </g>
     );
 
-    useEffect(() => {
-        const fetchHierarchyData = async () => {
-            try {
-                const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/employees/hierarchy`);
-                const originalTreeData = response.data;
-                const newTreeData = {
-                    name: originalTreeData[0].name,
-                    role: originalTreeData[0].role,
-                    employee_number: originalTreeData[0].employee_number,
-                    children: originalTreeData[0].children.map(child => ({
-                        name: child.name,
-                        role: child.role,
-                        employee_number: child.employee_number,
-                        children: child.children,
-                    })),
-                };
-                setTreeData(newTreeData);
-            } catch (error) {
-                console.error('Error fetching hierarchy data:', error);
-            }
+    const fetchHierarchyData = async () => {
+        try {
+            // const endpoint = searchTerm ? `/api/employees/search?term=${encodeURIComponent(searchTerm)}` : '/api/employees/hierarchy';
+            // const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}${endpoint}`);
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/employees/hierarchy`);
+            const originalTreeData = response.data;
+            const fetchedData = response.data;
+            const newTreeData = {
+                name: originalTreeData[0].name,
+                role: originalTreeData[0].role,
+                employee_number: originalTreeData[0].employee_number,
+                children: originalTreeData[0].children.map(child => ({
+                    name: child.name,
+                    role: child.role,
+                    employee_number: child.employee_number,
+                    children: child.children,
+                })),
+            };
+            setTreeData([newTreeData]);
+            setOriginalTreeData([fetchedData]);
+        } catch (error) {
+            console.error('Error fetching hierarchy data:', error);
         };
+    };
 
+
+    useEffect(() => {
         fetchHierarchyData();
     }, []);
-
+    
     return (
         <Container>
             <Typography variant="h4" style={{ margin: '20px 0' }}>Company Hierarchy</Typography>
             <Box height="600px" className="tree-container">
-                {treeData && 
+            {treeData && 
                     <Tree
                         data={treeData}
                         orientation="vertical"
@@ -64,11 +76,13 @@ const HierarchyPage = () => {
                         translate={{ x: 100, y: 300 }}
                         renderCustomNodeElement={renderRectSvgNode}
                     />
-                }
+                
+            }
             </Box>
             <AddEmployeeForm />
         </Container>
     );
 };
+
 
 export default HierarchyPage;
