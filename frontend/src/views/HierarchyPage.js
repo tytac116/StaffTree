@@ -6,10 +6,17 @@ import { Container, Typography, Box, TextField } from '@mui/material';
 import AddEmployeeForm from '../components/AddEmployeeForm';
 import './HierarchyPage.css';
 import { debounce } from 'lodash';
+import EditEmployeeModal from '../components/EditEmployeeModal';
 
 const HierarchyPage = () => {
     const [treeData, setTreeData] = useState(null);
     const [originalTreeData, setOriginalTreeData] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+
+
 
 
    
@@ -30,8 +37,28 @@ const HierarchyPage = () => {
                 </text>
             )}
 
+            <text
+                className="tree-node-text"
+                x={20} // Adjust x coordinate
+                y={60} // Adjust y coordinate
+                onClick={() => handleEdit(nodeDatum.id)}
+                style={{ cursor: 'pointer', fill: 'blue' }} // Style the text
+            >
+                Edit
+            </text>
+            <text
+                className="tree-node-text"
+                x={20} // Adjust x coordinate
+                y={80} // Adjust y coordinate
+                onClick={() => handleDelete(nodeDatum.id)}
+                style={{ cursor: 'pointer', fill: 'red'}} // Style the text
+            >
+                Delete
+            </text>
+
             
         </g>
+
     );
 
     const fetchHierarchyData = async () => {
@@ -59,6 +86,62 @@ const HierarchyPage = () => {
         };
     };
 
+    const handleSearchChange = async (e) => {
+        const term = e.target.value;
+        setSearchTerm(term);
+
+        if (term) {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/employees/search`, {
+                    params: { searchTerm: term }
+                });
+                setTreeData(response.data);
+            } catch (error) {
+                console.error('Error fetching search data:', error);
+            }
+        } else {
+            fetchHierarchyData(); // Fetch original data when search is cleared
+        }
+    };
+
+    const handleEdit = async (id) => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/employees/${id}`);
+            console.log('Selected Employee Data:', response.data); // Check the received data
+            setSelectedEmployee(response.data);
+            setIsEditModalOpen(true);
+        } catch (error) {
+            console.error('Error fetching employee data:', error);
+        }
+    };
+    
+
+    const handleDelete = async (id) => {
+        if (window.confirm('Are you sure you want to delete this employee?')) {
+            try {
+                await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/employees/${id}`);
+                // Optionally, refresh the tree data or remove the employee from the local state
+                fetchHierarchyData(); // If you want to refresh the whole tree
+                // Or use a state update to remove the employee from the local state
+            } catch (error) {
+                console.error('Error deleting employee:', error);
+                // Handle error (e.g., show a notification to the user)
+            }
+        }
+    };
+    
+    const handleSaveEdit = async (updatedEmployee) => {
+        try {
+            await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/employees/${updatedEmployee.id}`, updatedEmployee);
+            fetchHierarchyData(); // Refresh data
+        } catch (error) {
+            console.error('Error updating employee:', error);
+        }
+    };
+    
+
+    
+
 
     useEffect(() => {
         fetchHierarchyData();
@@ -68,6 +151,13 @@ const HierarchyPage = () => {
         <Container>
             <Typography variant="h4" style={{ margin: '20px 0' }}>Company Hierarchy</Typography>
             <Box height="600px" className="tree-container">
+            <TextField
+                label="Search Employees"
+                variant="outlined"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                style={{ marginBottom: '20px' }}
+            />
             {treeData && 
                     <Tree
                         data={treeData}
@@ -78,6 +168,14 @@ const HierarchyPage = () => {
                     />
                 
             }
+
+            {isEditModalOpen && (
+                <EditEmployeeModal
+                    employee={selectedEmployee}
+                    onClose={() => setIsEditModalOpen(false)}
+                    onSave={handleSaveEdit}
+                />
+            )}
             </Box>
             <AddEmployeeForm />
         </Container>

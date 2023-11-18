@@ -26,3 +26,13 @@
   background-color: #f50057;
   color: white;
 }
+
+.tree-node-text {
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+  color: blue;
+}
+
+.tree-node-text:hover {
+  font-weight: bold;
+}
