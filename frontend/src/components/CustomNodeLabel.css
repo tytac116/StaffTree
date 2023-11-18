@@ -1,0 +1,13 @@
+/* CustomNodeLabel.css */
+.custom-node-label {
+    background-color: #f5f5f5;
+    border: 1px solid #ffffff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 200px; /* Adjust width as needed */
+  }
+  
+
+  

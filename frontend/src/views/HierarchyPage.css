@@ -1,0 +1,9 @@
+
+/* HierarchyPage.css */
+.tree-container {
+  max-width: 100%;
+  overflow: auto;
+  display: flex;
+  justify-content: center; /* Center the tree horizontally */
+  align-items: flex-start; /* Align the tree to the top */
+}
