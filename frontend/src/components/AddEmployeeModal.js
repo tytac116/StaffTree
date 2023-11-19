@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, TextField, Button, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { Modal, Box, TextField, Button, Select, MenuItem, InputLabel, FormControl, Snackbar } from '@mui/material';
 import {jwtDecode} from 'jwt-decode';
+import MuiAlert from '@mui/material/Alert';
+import axios from 'axios';
 
 const style = {
     position: 'absolute',
@@ -13,6 +15,11 @@ const style = {
     p: 4,
 };
 
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+
 const AddEmployeeModal = ({ isOpen, onClose, onSave }) => {
     const [formData, setFormData] = useState({
         email: '',
@@ -20,17 +27,32 @@ const AddEmployeeModal = ({ isOpen, onClose, onSave }) => {
         access_role: ''
     });
 
+    const [employees, setEmployees] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
+
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+
     useEffect(() => {
         const storedToken = localStorage.getItem('token'); // Replace 'token' with the exact key
-        console.log("Captured token:", storedToken); // Debugging line
     
         if (storedToken) {
             const decodedToken = jwtDecode(storedToken);
-            console.log("Decoded token:", decodedToken); // Debugging line
+            setCurrentUser(decodedToken);
+            //console.log("Decoded token:", decodedToken); // Debugging line
             setFormData(prevFormData => ({ ...prevFormData, companyId: decodedToken.companyId }));
+            fetchAllEmployees();
         }
     }, []);
     
+    const fetchAllEmployees = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/employees`);
+            const filteredEmployees = response.data.filter(emp => emp.id !== currentUser.userId);
+            setEmployees(filteredEmployees);
+        } catch (error) {
+            console.error('Error fetching employees:', error);
+        }
+    };
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,8 +62,16 @@ const AddEmployeeModal = ({ isOpen, onClose, onSave }) => {
         onSave(formData);
         onClose();
         setFormData({ email: '', companyId: '', access_role: '' }); // Reset form
+        setOpenSnackbar(true);
     };
 
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenSnackbar(false);
+    };
     return (
         <Modal
             open={isOpen}
@@ -85,6 +115,11 @@ const AddEmployeeModal = ({ isOpen, onClose, onSave }) => {
                 <Button onClick={handleSubmit} color="primary">
                     Add Employee
                 </Button>
+                <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                    <Alert onClose={handleCloseSnackbar} severity="success">
+                        Employee added successfully!
+                    </Alert>
+                </Snackbar>
             </Box>
         </Modal>
     );

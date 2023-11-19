@@ -13,13 +13,13 @@ const CompanyRegistration = () => {
         password: '',
         companyName: '',
         address: '',
-        firstName: '',
-        lastName: '',
-        birthDate: '',
-        employeeNumber: '',
+        first_name: '',
+        last_name: '',
+        birth_date: '',
+        employee_number: '',
         salary: '',
-        role: '',
-        managerId: ''
+        role: ''
+        
     });
 
     const handleChange = (e) => {
@@ -35,7 +35,7 @@ const CompanyRegistration = () => {
             navigate('/hierarchy'); // after successful login
 
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     };
 
@@ -95,8 +95,8 @@ const CompanyRegistration = () => {
             <TextField
                 label="First Name"
                 type="text"
-                name="firstName"
-                value={formData.firstName}
+                name="first_name" 
+                value={formData.first_name} 
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
@@ -105,8 +105,8 @@ const CompanyRegistration = () => {
             <TextField
                 label="Last Name"
                 type="text"
-                name="lastName"
-                value={formData.lastName}
+                name="last_name" 
+                value={formData.last_name} 
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
@@ -116,8 +116,8 @@ const CompanyRegistration = () => {
             <TextField
                 label="Birth Date"
                 type="date"
-                name="birthDate"
-                value={formData.birthDate}
+                name="birth_date" 
+                value={formData.birth_date} 
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
@@ -127,8 +127,8 @@ const CompanyRegistration = () => {
             <TextField
                 label="Employee Number"
                 type="text"
-                name="employeeNumber"
-                value={formData.employeeNumber}
+                name="employee_number" 
+                value={formData.employee_number} 
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
@@ -147,7 +147,7 @@ const CompanyRegistration = () => {
             />
 
             <TextField
-                label="Role"
+                label="Role/Position"
                 type="text"
                 name="role"
                 value={formData.role}
@@ -157,7 +157,7 @@ const CompanyRegistration = () => {
                 required
             />
 
-            <TextField
+            {/* <TextField
                 label="Manager ID"
                 type="number"
                 name="managerId"
@@ -166,7 +166,7 @@ const CompanyRegistration = () => {
                 fullWidth
                 margin="normal"
                 required
-            />
+            /> */}
 
             <br />
                 <Button type="submit" variant="contained" color="primary" className="registration-button" fullWidth>Register</Button>

@@ -4,6 +4,7 @@ import HomePage from './views/HomePage';
 import CompanyRegistration from './views/CompanyRegistration';
 import LoginPage from './views/LoginPage';
 import HierarchyPage from './views/HierarchyPage';
+import CompleteRegistration from './views/CompleteRegistration';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/register-company" element={<CompanyRegistration />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/hierarchy" element={<HierarchyPage />} />
+        <Route path="/complete-registration" element={<CompleteRegistration />} />
 
       </Routes>
     </div>

@@ -241,13 +241,13 @@ const HierarchyPage = () => {
                 />
             )}
             <Box height="600px" className="tree-container">
-            <TextField
+            {/* <TextField
                 label="Search Employees"
                 variant="outlined"
                 value={searchTerm}
                 onChange={handleSearchChange}
                 style={{ marginBottom: '20px' }}
-            />
+            /> */}
 
             
             {treeData && 
