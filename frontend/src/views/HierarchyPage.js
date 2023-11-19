@@ -17,6 +17,7 @@ const HierarchyPage = () => {
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
 
 
 
@@ -43,6 +44,8 @@ const HierarchyPage = () => {
                 </text>
             )}
 
+            {canEditOrDelete(nodeDatum) && (
+            <>
             <text
                 className="tree-node-text"
                 x={20} // Adjust x coordinate
@@ -61,6 +64,8 @@ const HierarchyPage = () => {
             >
                 Delete
             </text>
+            </>
+            )}
 
             
         </g>
@@ -79,12 +84,14 @@ const HierarchyPage = () => {
                 role: originalTreeData[0].role,
                 employee_number: originalTreeData[0].employee_number,
                 id: originalTreeData[0].id,
+                access_role: originalTreeData[0].access_role,
                 children: originalTreeData[0].children.map(child => ({
                     name: child.name,
                     role: child.role,
                     employee_number: child.employee_number,
                     children: child.children,
                     id: child.id,
+                    access_role: child.access_role,
                 })),
             };
             setTreeData([newTreeData]);
@@ -156,9 +163,23 @@ const HierarchyPage = () => {
             console.error('Error updating employee:', error);
         }
     };
-    
+
+    const canEditOrDelete = (nodeDatum) => {
+        return currentUser && (
+            currentUser.accessRole === 'Admin' ||
+            currentUser.userId === nodeDatum.id
+        );
+    };
 
     
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decoded = jwtDecode(token);
+            setCurrentUser(decoded);
+        }
+    }, []);
 
 
     useEffect(() => {
@@ -168,7 +189,9 @@ const HierarchyPage = () => {
     return (
         <Container>
             <Typography variant="h4" style={{ margin: '20px 0' }}>Company Hierarchy</Typography>
+            {currentUser && currentUser.accessRole === 'Admin' && (
             <Button onClick={() => setIsAddModalOpen(true)}>Add Employee</Button>
+            )}
             {isAddModalOpen && (
                 <AddEmployeeModal
                     isOpen={isAddModalOpen}
@@ -184,6 +207,8 @@ const HierarchyPage = () => {
                 onChange={handleSearchChange}
                 style={{ marginBottom: '20px' }}
             />
+
+            
             {treeData && 
                     <Tree
                         data={treeData}
