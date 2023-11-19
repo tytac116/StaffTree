@@ -18,10 +18,15 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/login`, formData);
-      console.log(response.data);  // Handle the response appropriately
+      console.log(response.data); // For debugging
+  
+      // Store the token in local storage
+      localStorage.setItem('token', response.data.token);
+  
+      // Navigate to the hierarchy page
       navigate('/hierarchy');
     } catch (error) {
-      console.error(error.message);  // Display error message
+      console.error(error.message); // Display error message
     }
   };
 

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Modal, Box, TextField, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Modal, Box, TextField, Button, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import {jwtDecode} from 'jwt-decode';
 
 const style = {
     position: 'absolute',
@@ -18,6 +19,18 @@ const AddEmployeeModal = ({ isOpen, onClose, onSave }) => {
         companyId: '',
         access_role: ''
     });
+
+    useEffect(() => {
+        const storedToken = localStorage.getItem('token'); // Replace 'token' with the exact key
+        console.log("Captured token:", storedToken); // Debugging line
+    
+        if (storedToken) {
+            const decodedToken = jwtDecode(storedToken);
+            console.log("Decoded token:", decodedToken); // Debugging line
+            setFormData(prevFormData => ({ ...prevFormData, companyId: decodedToken.companyId }));
+        }
+    }, []);
+    
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -52,15 +65,23 @@ const AddEmployeeModal = ({ isOpen, onClose, onSave }) => {
                     onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    InputProps={{
+                        readOnly: true,
+                    }}
                 />
-                <TextField
-                    label="Access Role"
-                    name="access_role"
-                    value={formData.access_role}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                />
+                <FormControl fullWidth margin="normal">
+                    <InputLabel id="access-role-label">Access Role</InputLabel>
+                    <Select
+                        labelId="access-role-label"
+                        name="access_role"
+                        value={formData.access_role}
+                        label="Access Role"
+                        onChange={handleChange}
+                    >
+                        <MenuItem value="Admin">Admin</MenuItem>
+                        <MenuItem value="Employee">Employee</MenuItem>
+                    </Select>
+                </FormControl>
                 <Button onClick={handleSubmit} color="primary">
                     Add Employee
                 </Button>

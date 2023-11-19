@@ -203,7 +203,7 @@ const HierarchyPage = () => {
                 />
             )}
             </Box>
-            <AddEmployeeForm />
+            {/* <AddEmployeeForm /> */}
         </Container>
     );
 };
