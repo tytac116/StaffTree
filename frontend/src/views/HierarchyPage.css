@@ -4,8 +4,10 @@
   max-width: 100%;
   overflow: auto;
   display: flex;
-  justify-content: center; /* Center the tree horizontally */
-  align-items: flex-start; /* Align the tree to the top */
+  justify-content: center; 
+  align-items: flex-start; 
+  padding: 20px;
+
 }
 
 .button-container {
@@ -27,12 +29,84 @@
   color: white;
 }
 
-.tree-node-text {
-  font-size: 12px;
-  font-family: Arial, sans-serif;
-  color: blue;
-}
 
 .tree-node-text:hover {
-  font-weight: bold;
+  text-decoration: underline;
+}
+
+
+.tree-node-text {
+  font-size: 14px;
+  cursor: pointer;
+}
+
+text {
+  font-size: 12px;
+}
+
+circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 3px;
+}
+
+.node circle {
+  fill: #e6f2ff; 
+  stroke: #1a75ff; 
+  stroke-width: 2px;
+}
+
+.node text {
+  fill: #333; 
+  font-weight: normal; 
+}
+
+.edit-button {
+  background-color: #4CAF50; 
+  color: white;
+  margin-right: 8px; 
+}
+
+
+.delete-button {
+  background-color: #f44336; 
+  color: white;
+}
+.node-image {
+  width: 30px;
+  height: 30px;
+  x: -15; 
+  y: -30; 
+}
+
+.node-button {
+  padding: 5px 10px; /* Padding inside the buttons */
+  border-radius: 5px; /* Rounded corners for buttons */
+  font-size: 12px; /* Smaller text for buttons */
+  text-transform: none; /* Prevent uppercase transform */
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  min-width: 300px;
+
+}
+
+.modal-content img {
+  max-width: 100px;
+  border-radius: 50%;
 }

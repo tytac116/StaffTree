@@ -8,6 +8,7 @@ import './HierarchyPage.css';
 import { debounce } from 'lodash';
 import EditEmployeeModal from '../components/EditEmployeeModal';
 import AddEmployeeModal from '../components/AddEmployeeModal';
+import md5 from 'md5';
 
 
 const HierarchyPage = () => {
@@ -18,31 +19,42 @@ const HierarchyPage = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
+    const [modalEmployee, setModalEmployee] = useState(null);
 
 
 
 
 
 
+    const handleNodeClick = (nodeDatum) => {
+        setModalEmployee(nodeDatum);
+
+    };
    
     const renderRectSvgNode = ({ nodeDatum, toggleNode }) => {
         //console.log("Node Data:", nodeDatum.id); // Log to see the structure of nodeDatum
+        let gravatarUrl = '';
+        if (nodeDatum.email) {
+        gravatarUrl = `https://www.gravatar.com/avatar/${md5(nodeDatum.email)}?d=identicon`;
+    }
         return (
-        <g>
-            <circle r="10" onClick={toggleNode} />
-            <text fill="black" strokeWidth="1" x="20">
+        <g onClick={() => handleNodeClick(nodeDatum)}>
+            
+            <image href={gravatarUrl} x="-10" y="-30" height="20px" width="20px" className="node-image" />
+            <circle r="10" onClick={toggleNode} className="node-circle" />
+            <text x="20" dy="20" className="tree-node-text">
                 {nodeDatum.name}
             </text>
             {nodeDatum.role && (
-                <text fill="black" x="20" dy="20" strokeWidth="1">
+                <text x="20" dy="40" className="tree-node-text">
                     Role: {nodeDatum.role}
                 </text>
             )}
-            {nodeDatum.employee_number && (
-                <text fill="black" x="20" dy="40" strokeWidth="1">
+            {/* {nodeDatum.employee_number && (
+                <text x="20" dy="60" className="tree-node-text">
                     Employee Number: {nodeDatum.employee_number}
                 </text>
-            )}
+            )} */}
 
             {canEditOrDelete(nodeDatum) && (
             <>
@@ -85,6 +97,8 @@ const HierarchyPage = () => {
                 employee_number: originalTreeData[0].employee_number,
                 id: originalTreeData[0].id,
                 access_role: originalTreeData[0].access_role,
+                email: originalTreeData[0].email,
+                birth_date: originalTreeData[0].birth_date,
                 children: originalTreeData[0].children.map(child => ({
                     name: child.name,
                     role: child.role,
@@ -92,10 +106,13 @@ const HierarchyPage = () => {
                     children: child.children,
                     id: child.id,
                     access_role: child.access_role,
+                    email: child.email,
+                    birth_date: child.birth_date,
                 })),
             };
+            console.log("Tree Data:", newTreeData); // Check the new tree data structure
             setTreeData([newTreeData]);
-            setOriginalTreeData([fetchedData]);
+            //setOriginalTreeData([fetchedData]);
         } catch (error) {
             console.error('Error fetching hierarchy data:', error);
         };
@@ -171,6 +188,30 @@ const HierarchyPage = () => {
         );
     };
 
+    const EmployeeDetailModal = ({ employee, onClose }) => {
+        if (!employee) return null;
+    
+        const gravatarUrl = `https://www.gravatar.com/avatar/${md5(employee.email)}?d=identicon`;
+        const birthDate = new Date(employee.birth_date).toLocaleDateString();
+
+    
+        return (
+            <div className="modal-overlay" onClick={onClose}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <img src={gravatarUrl} alt="Gravatar" />
+                    <h3>{employee.name}</h3>
+                    <p>Role: {employee.role}</p>
+                    <p>Employee Number: {employee.employee_number}</p>
+                    <p>Email: {employee.email}</p>
+                    <p>Birth Date: {birthDate}</p>
+  
+
+                    <button onClick={onClose}>Close</button>
+                </div>
+            </div>
+        );
+    };
+
     
 
     useEffect(() => {
@@ -216,9 +257,15 @@ const HierarchyPage = () => {
                         scaleExtent={{ min: 0.1, max: 1 }}
                         translate={{ x: 100, y: 300 }}
                         renderCustomNodeElement={renderRectSvgNode}
+                        width={1000} 
+                        height={1000} 
+                        
                     />
                 
             }
+
+            {modalEmployee && <EmployeeDetailModal employee={modalEmployee} onClose={() => setModalEmployee(null)} />}
+
 
             {isEditModalOpen && (
                 <EditEmployeeModal

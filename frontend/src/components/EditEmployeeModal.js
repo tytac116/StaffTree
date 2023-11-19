@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, TextField, Button } from '@mui/material';
+import { Modal, Box, TextField, Button, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import axios from 'axios';
 
 const style = {
     position: 'absolute',
@@ -14,15 +15,31 @@ const style = {
 
 const EditEmployeeModal = ({ employee, onClose, onSave }) => {
     const [formData, setFormData] = useState({ ...employee });
+    const [employees, setEmployees] = useState([]);
 
     useEffect(() => {
         if (employee) {
             setFormData({ ...employee });
+            fetchEmployees();
         }
     }, [employee]);
 
+    const fetchEmployees = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/employees`);
+            setEmployees(response.data); // Assuming the response has a list of employees
+        } catch (error) {
+            console.error('Error fetching employees:', error);
+        }
+    };
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleManagerChange = (e) => {
+        const selectedEmployeeId = employees.find(emp => `${emp.first_name} ${emp.last_name}` === e.target.value)?.id;
+        setFormData({ ...formData, manager_id: selectedEmployeeId });
     };
 
     const handleSubmit = async () => {
@@ -78,6 +95,21 @@ const EditEmployeeModal = ({ employee, onClose, onSave }) => {
                     fullWidth
                     margin="normal"
                 />
+
+<               FormControl fullWidth margin="normal">
+                    <InputLabel>Manager</InputLabel>
+                    <Select
+                        value={employees.find(emp => emp.id === formData.manager_id)?.name || ''}
+                        onChange={handleManagerChange}
+                        label="Manager"
+                    >
+                        {employees.map(emp => (
+                            <MenuItem key={emp.id} value={`${emp.first_name} ${emp.last_name}`}>
+                                {emp.first_name} {emp.last_name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
                 <Button onClick={handleSubmit} color="primary">
                     Save
                 </Button>
