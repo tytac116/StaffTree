@@ -38,9 +38,11 @@ const getHierarchy = async (req, res) => {// Function to get the hierarchy of em
         const result = await db.query(`
             SELECT e1.*, e2.first_name AS manager_first_name, e2.last_name AS manager_last_name
             FROM employee e1
-            LEFT JOIN employee e2 ON e1.manager_id = e2.id
-            WHERE e1.company_id = $1
-        ` , [req.user.companyId]); // $1 is replaced with the company ID from the request user
+            LEFT JOIN employee e2 ON e1.manager_id = e2.id`);
+        //     WHERE e1.company_id = $1
+        // ` , [req.user.companyId]); // $1 is replaced with the company ID from the request user
+        const hierarchyData = buildHierarchyTree(result.rows);
+        res.json(hierarchyData);
     } catch (err) {
         // If an error occurs, send a 500 status code and the error message
         res.status(500).json({ message: err.message });
@@ -55,15 +57,18 @@ const buildHierarchyTree = (employees) => {// Function to build a hierarchical t
 
     // First loop: add each employee to the lookup object and add an empty children array to each employee
     employees.forEach(emp => {
+        emp.name = `${emp.first_name} ${emp.last_name}`; // Combine name and ID
+        //emp.name = `${emp.first_name} ${emp.last_name} (${emp.role}, ${emp.employee_number})`;
+
         lookup[emp.id] = emp;
         lookup[emp.id].children = [];
     });
 
     // Second loop: add each employee to their manager's children array or to the tree if they don't have a manager
     employees.forEach(emp => {
-        if (emp.manager_id) {
+        if (emp.manager_id && lookup[emp.manager_id]) {
             lookup[emp.manager_id].children.push(lookup[emp.id]);
-        } else {
+        } else if (!emp.manager_id) {
             tree.push(lookup[emp.id]);
         }
     });
@@ -72,10 +77,82 @@ const buildHierarchyTree = (employees) => {// Function to build a hierarchical t
     return tree;
 };
 
+// In employeeController.js
+
+// Search employees
+const searchEmployee = async (req, res) => {
+    try {
+        const { searchTerm } = req.query;
+        const query = `
+            SELECT * FROM employee 
+            WHERE CONCAT(first_name, ' ', last_name) ILIKE $1
+               OR role ILIKE $1
+               OR employee_number::text ILIKE $1`;
+        const result = await db.query(query, [`%${searchTerm}%`]);
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// Update employee details
+const updateEmployee = async (req, res) => {
+    const { id } = req.params;
+    const { first_name, last_name, salary, role, manager_id } = req.body;
+
+    try {
+        await db.query(
+            'UPDATE employee SET first_name = $1, last_name = $2, salary = $3, role = $4, manager_id = $5 WHERE id = $6',
+            [first_name, last_name, salary, role, manager_id, id]
+        );
+        res.json({ message: 'Employee updated successfully' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// Delete employee
+const deleteEmployee = async (req, res) => {
+    const { id } = req.params; // assuming the employee ID is passed as a URL parameter
+
+    try {
+        await db.query('DELETE FROM employee WHERE id = $1', [id]);
+        res.json({ message: 'Employee deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+
+// In your employeeController.js or similar file
+const getEmployeeById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await db.query('SELECT * FROM employee WHERE id = $1', [id]);
+        if (result.rows.length > 0) {
+            res.json(result.rows[0]);
+        } else {
+            res.status(404).send('Employee not found');
+        }
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+
+
+
+
+
+
 
 module.exports = {
     addEmployee,
     completeRegistration,
     getHierarchy,
-    buildHierarchyTree
+    buildHierarchyTree,
+    searchEmployee,
+    updateEmployee,
+    deleteEmployee,
+    getEmployeeById
 };
