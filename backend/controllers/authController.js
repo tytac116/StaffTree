@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../config/dbConfig');
 
 const register = async (req, res) => {
-    const { email, password, companyName, address, first_name, last_name, birth_date, employee_number, salary, role, manager_id} = req.body;
+    const { email, password, companyName, address, first_name, last_name, birth_date, employee_number, salary, role} = req.body;
     try {
         const hashedPassword = await bcrypt.hash(password, 10); //hash password
         const newCompany = await db.query( //insert new company into DB
@@ -12,8 +12,8 @@ const register = async (req, res) => {
         );
         const companyID = newCompany.rows[0].id; //get new company id
         const newUser = await db.query( //insert new employee into DB
-            "INSERT INTO employee (email, password_hash, company_id, access_role, first_name, last_name, birth_date, employee_number, salary, role, manager_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id", 
-            [email, hashedPassword, companyID, 'Admin', first_name, last_name, birth_date, employee_number, salary, role, manager_id]
+            "INSERT INTO employee (email, password_hash, company_id, access_role, first_name, last_name, birth_date, employee_number, salary, role) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id", 
+            [email, hashedPassword, companyID, 'Admin', first_name, last_name, birth_date, employee_number, salary, role]
         );
 
         res.status(201).json({ userId: newUser.rows[0].id, companyId: companyID });

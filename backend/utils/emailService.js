@@ -18,7 +18,7 @@ const sendRegistrationEmail = async (receipientEmail, registrationLink) => {
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: receipientEmail,
-        subject: 'Complete your registration',
+        subject: 'Complete your StaffTree registration! ',
         html: `<p>Click <a href="${registrationLink}">here</a> to complete your registration</p>`,
     };
 

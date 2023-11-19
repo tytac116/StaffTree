@@ -9,6 +9,7 @@ router.get('/employees/search', employeeController.searchEmployee);
 router.put('/employees/:id', employeeController.updateEmployee);
 router.delete('/employees/:id', employeeController.deleteEmployee);
 router.get('/employees/:id', employeeController.getEmployeeById);
+router.get('/employees', employeeController.getAllEmployees);
 
 
 // Other CRUD routes for employees
