@@ -8,7 +8,7 @@ const addEmployee = async (req, res) => {
         await db.query('INSERT INTO employee (email, company_id, access_role, first_name, last_name, employee_number) VALUES ($1, $2, $3, $4, $5, $6)', [email, companyId, access_role, "", "",""]); // Add employee with minimal details
 
         //const registrationLink = `https://yourapp.com/complete-registration?email=${email}`; //Create registration link
-        const registrationLink = process.env.REACT_APP_BACKEND_URL + "/complete-registration?email=" + email;
+        const registrationLink = process.env.REACT_APP_BACKEND_URL + "complete-registration?email=" + email;
         sendRegistrationEmail(email, registrationLink); //Send email invitation
         res.status(201).json({ message: 'Employee added and invitation sent successfully' });
 
