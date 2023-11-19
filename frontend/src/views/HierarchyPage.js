@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Tree from 'react-d3-tree';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import { Container, Typography, Box, TextField } from '@mui/material';
+import { Container, Typography, Box, TextField, Button } from '@mui/material';
 import AddEmployeeForm from '../components/AddEmployeeForm';
 import './HierarchyPage.css';
 import { debounce } from 'lodash';
 import EditEmployeeModal from '../components/EditEmployeeModal';
+import AddEmployeeModal from '../components/AddEmployeeModal';
+
 
 const HierarchyPage = () => {
     const [treeData, setTreeData] = useState(null);
@@ -14,13 +16,17 @@ const HierarchyPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
 
 
 
 
 
    
-    const renderRectSvgNode = ({ nodeDatum, toggleNode }) => (
+    const renderRectSvgNode = ({ nodeDatum, toggleNode }) => {
+        //console.log("Node Data:", nodeDatum.id); // Log to see the structure of nodeDatum
+        return (
         <g>
             <circle r="10" onClick={toggleNode} />
             <text fill="black" strokeWidth="1" x="20">
@@ -58,8 +64,8 @@ const HierarchyPage = () => {
 
             
         </g>
-
-    );
+        );
+    };
 
     const fetchHierarchyData = async () => {
         try {
@@ -72,11 +78,13 @@ const HierarchyPage = () => {
                 name: originalTreeData[0].name,
                 role: originalTreeData[0].role,
                 employee_number: originalTreeData[0].employee_number,
+                id: originalTreeData[0].id,
                 children: originalTreeData[0].children.map(child => ({
                     name: child.name,
                     role: child.role,
                     employee_number: child.employee_number,
                     children: child.children,
+                    id: child.id,
                 })),
             };
             setTreeData([newTreeData]);
@@ -114,6 +122,16 @@ const HierarchyPage = () => {
             console.error('Error fetching employee data:', error);
         }
     };
+
+    const handleAddEmployee = async (newEmployee) => {
+        try {
+            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/employees/add-employee`, newEmployee);
+            fetchHierarchyData(); // Refresh data
+        } catch (error) {
+            console.error('Error adding employee:', error);
+        }
+    };
+    
     
 
     const handleDelete = async (id) => {
@@ -150,6 +168,14 @@ const HierarchyPage = () => {
     return (
         <Container>
             <Typography variant="h4" style={{ margin: '20px 0' }}>Company Hierarchy</Typography>
+            <Button onClick={() => setIsAddModalOpen(true)}>Add Employee</Button>
+            {isAddModalOpen && (
+                <AddEmployeeModal
+                    isOpen={isAddModalOpen}
+                    onClose={() => setIsAddModalOpen(false)}
+                    onSave={handleAddEmployee}
+                />
+            )}
             <Box height="600px" className="tree-container">
             <TextField
                 label="Search Employees"

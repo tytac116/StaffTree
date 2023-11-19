@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Box, TextField, Button } from '@mui/material';
 
 const style = {
@@ -13,35 +13,71 @@ const style = {
 };
 
 const EditEmployeeModal = ({ employee, onClose, onSave }) => {
-    const [formData, setFormData] = useState(employee);
+    const [formData, setFormData] = useState({ ...employee });
+
+    useEffect(() => {
+        if (employee) {
+            setFormData({ ...employee });
+        }
+    }, [employee]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async () => {
-        // Call onSave with the updated formData
         onSave(formData);
-        onClose(); // Close modal after save
+        onClose();
     };
 
     return (
         <Modal
             open={Boolean(employee)}
             onClose={onClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
+            aria-labelledby="edit-employee-modal-title"
+            aria-describedby="edit-employee-modal-description"
         >
             <Box sx={style}>
                 <TextField
                     label="First Name"
                     name="first_name"
-                    value={formData.first_name}
+                    value={formData.first_name || ''}
                     onChange={handleChange}
                     fullWidth
                     margin="normal"
                 />
-                {/* Add other fields similarly */}
+                <TextField
+                    label="Last Name"
+                    name="last_name"
+                    value={formData.last_name || ''}
+                    onChange={handleChange}
+                    fullWidth
+                    margin="normal"
+                />
+                <TextField
+                    label="Salary"
+                    name="salary"
+                    value={formData.salary || ''}
+                    onChange={handleChange}
+                    fullWidth
+                    margin="normal"
+                />
+                <TextField
+                    label="Role"
+                    name="role"
+                    value={formData.role || ''}
+                    onChange={handleChange}
+                    fullWidth
+                    margin="normal"
+                />
+                <TextField
+                    label="Manager ID"
+                    name="manager_id"
+                    value={formData.manager_id || ''}
+                    onChange={handleChange}
+                    fullWidth
+                    margin="normal"
+                />
                 <Button onClick={handleSubmit} color="primary">
                     Save
                 </Button>
