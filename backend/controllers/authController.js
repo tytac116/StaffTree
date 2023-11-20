@@ -17,8 +17,8 @@ const register = async (req, res) => {
         );
         const userId = newUser.rows[0].id;
         const token = jwt.sign({ userId: userId, email: email, accessRole: 'Admin', companyId: companyID }, process.env.ACCESS_TOKEN_SECRET);
-        res.status(201).json({ userId: newUser.rows[0].id, companyId: companyID });
-        res.json({ token });
+        res.status(201).json({ token, userId: userId, companyId: companyID });
+
 
     } catch (err) {
         res.status(500).json({ message: err.message });
