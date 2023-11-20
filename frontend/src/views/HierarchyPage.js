@@ -22,7 +22,7 @@ const HierarchyPage = () => {
     const [modalEmployee, setModalEmployee] = useState(null);
 
 
-
+    console.log("JWT TOKEN", localStorage.getItem('token'));
 
 
 

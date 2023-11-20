@@ -31,7 +31,7 @@ const CompanyRegistration = () => {
         try{
             const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/register`, formData);
             console.log(response.data);
-            
+            localStorage.setItem('token', response.data.token);
             navigate('/hierarchy'); // after successful login
 
         } catch (err) {
