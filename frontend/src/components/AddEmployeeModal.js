@@ -37,7 +37,8 @@ const AddEmployeeModal = ({ isOpen, onClose, onSave }) => {
     
         if (storedToken) {
             const decodedToken = jwtDecode(storedToken);
-            setCurrentUser(decodedToken);
+            //setCurrentUser(decodedToken);
+            setCurrentUser({ userId: decodedToken.userId, companyId: decodedToken.companyId });
             //console.log("Decoded token:", decodedToken); // Debugging line
             setFormData(prevFormData => ({ ...prevFormData, companyId: decodedToken.companyId }));
             fetchAllEmployees();
