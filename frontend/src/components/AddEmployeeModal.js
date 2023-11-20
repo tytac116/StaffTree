@@ -60,11 +60,19 @@ const AddEmployeeModal = ({ isOpen, onClose, onSave }) => {
     };
 
     const handleSubmit = async () => {
-        onSave(formData);
-        onClose();
-        setFormData({ email: '', companyId: '', access_role: '' }); // Reset form
-        setOpenSnackbar(true);
+        onSave(formData)
+            .then(() => {
+                // Close and reset after successful save
+                onClose();
+                setFormData({ email: '', companyId: '', access_role: '' });
+                setOpenSnackbar(true);
+            })
+            .catch(error => {
+                console.error('Error saving employee:', error);
+                // Handle error (e.g., show error notification)
+            });
     };
+    
 
     const handleCloseSnackbar = (event, reason) => {
         if (reason === 'clickaway') {

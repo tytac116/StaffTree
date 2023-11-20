@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Container, Typography } from '@mui/material';
+import { TextField, Button, Container, Typography, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './CompanyRegistration.css';
@@ -8,6 +8,7 @@ import './CompanyRegistration.css';
 
 const CompanyRegistration = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -28,14 +29,16 @@ const CompanyRegistration = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try{
             const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/register`, formData);
             console.log(response.data);
             localStorage.setItem('token', response.data.token);
             navigate('/hierarchy'); // after successful login
-
         } catch (err) {
             console.error(err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -169,8 +172,7 @@ const CompanyRegistration = () => {
             /> */}
 
             <br />
-                <Button type="submit" variant="contained" color="primary" className="registration-button" fullWidth>Register</Button>
-            </form>
+            {loading ? <CircularProgress /> : <Button type="submit" variant="contained" color="primary" className="registration-button" fullWidth>Register</Button>}            </form>
         </Container>
     );
 };
