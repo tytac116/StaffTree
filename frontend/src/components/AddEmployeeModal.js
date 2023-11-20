@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, TextField, Button, Select, MenuItem, InputLabel, FormControl, Snackbar } from '@mui/material';
+import { Modal, Box, TextField, Button, Select, MenuItem, InputLabel, FormControl, Snackbar, CircularProgress } from '@mui/material';
 import {jwtDecode} from 'jwt-decode';
 import MuiAlert from '@mui/material/Alert';
 import axios from 'axios';
@@ -29,6 +29,8 @@ const AddEmployeeModal = ({ isOpen, onClose, onSave }) => {
 
     const [employees, setEmployees] = useState([]);
     const [currentUser, setCurrentUser] = useState(null);
+    const [loading, setLoading] = useState(false);
+
 
     const [openSnackbar, setOpenSnackbar] = useState(false);
 
@@ -37,14 +39,16 @@ const AddEmployeeModal = ({ isOpen, onClose, onSave }) => {
     
         if (storedToken) {
             const decodedToken = jwtDecode(storedToken);
-            //setCurrentUser(decodedToken);
             setCurrentUser({ userId: decodedToken.userId, companyId: decodedToken.companyId });
-            //console.log("Decoded token:", decodedToken); // Debugging line
             setFormData(prevFormData => ({ ...prevFormData, companyId: decodedToken.companyId }));
-            fetchAllEmployees();
         }
     }, []);
     
+    useEffect(() => {
+        if (currentUser) {
+            fetchAllEmployees();
+        }
+    }, [currentUser]);
     const fetchAllEmployees = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/employees`);
@@ -60,6 +64,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSave }) => {
     };
 
     const handleSubmit = async () => {
+        setLoading(true);
         onSave(formData)
             .then(() => {
                 // Close and reset after successful save
@@ -70,6 +75,9 @@ const AddEmployeeModal = ({ isOpen, onClose, onSave }) => {
             .catch(error => {
                 console.error('Error saving employee:', error);
                 // Handle error (e.g., show error notification)
+            })
+            .finally(() => {
+                setLoading(false);
             });
     };
     
@@ -121,9 +129,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSave }) => {
                         <MenuItem value="Employee">Employee</MenuItem>
                     </Select>
                 </FormControl>
-                <Button onClick={handleSubmit} color="primary">
-                    Add Employee
-                </Button>
+                {loading ? <CircularProgress /> : <Button onClick={handleSubmit} color="primary">Add Employee</Button>}
                 <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
                     <Alert onClose={handleCloseSnackbar} severity="success">
                         Employee added successfully!

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, CircularProgress, Snackbar, Alert } from '@mui/material';
 import axios from 'axios';
 import './LoginPage.css';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 const LoginPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -16,6 +18,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/login`, formData);
       console.log(response.data); // For debugging
@@ -25,8 +28,11 @@ const LoginPage = () => {
   
       // Navigate to the hierarchy page
       navigate('/hierarchy');
+      setSuccess(true);
     } catch (error) {
       console.error(error.message); // Display error message
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,8 +61,12 @@ const LoginPage = () => {
           required
         />
         < br />
-        <Button type="submit" variant="contained" color="primary" className="login-button" fullWidth>Login</Button>
-
+        {loading ? <CircularProgress /> : <Button type="submit" variant="contained" color="primary" className="login-button" fullWidth>Login</Button>}
+        <Snackbar open={success} autoHideDuration={6000} onClose={() => setSuccess(false)}>
+          <Alert onClose={() => setSuccess(false)} severity="success">
+            Login successful!
+          </Alert>
+        </Snackbar>
       </form>
     </Container>
   );

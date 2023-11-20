@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Container, Typography, Alert, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { TextField, Button, Container, Typography, Alert, FormControl, InputLabel, Select, MenuItem, CircularProgress } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import './CompleteRegistration.css';
 
 const CompleteRegistration = () => {
     const navigate = useNavigate();
-    const { token } = useParams(); // Assuming the token is passed as a URL param
+    const { token } = useParams(); 
+    const [loading, setLoading] = useState(false);
+
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -42,6 +44,7 @@ const CompleteRegistration = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
             await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/employees/complete-registration`, { ...formData, token });
             setSuccess(true);
@@ -49,6 +52,8 @@ const CompleteRegistration = () => {
         } catch (err) {
             console.error(err);
             setSuccess(false);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -162,8 +167,7 @@ const CompleteRegistration = () => {
                     ))}
                 </Select>
     </FormControl>
-    <Button type="submit" variant="contained" color="primary" className="complete-registration-button" fullWidth>Complete Registration</Button>
-</form>
+    {loading ? <CircularProgress /> : <Button type="submit" variant="contained" color="primary" className="complete-registration-button" fullWidth>Complete Registration</Button>}</form>
             {success && <Alert severity="success">Registration successful! Redirecting to login...</Alert>}
         </Container>
     );
